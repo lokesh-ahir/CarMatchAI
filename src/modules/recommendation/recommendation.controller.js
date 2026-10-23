@@ -1,6 +1,6 @@
-import { parseQuery, generateReasons } from './queryParser.js';
-import { scoreAndRank } from './scoringEngine.js';
-import { carDataset } from './index.js';
+import { parseQuery, generateReasons } from './ai.service.js';
+import { scoreAndRank } from './scoring.engine.js';
+import { carDataset } from '../../server.js';
 import NodeCache from 'node-cache';
 
 // Cache AI responses for 1 hour to improve performance and reduce API costs
@@ -19,6 +19,13 @@ export async function handleRecommendation(req, res) {
   if (!query || typeof query !== 'string' || query.trim().length === 0) {
     return res.status(400).json({
       error: 'Missing or empty "query" field in request body.',
+    });
+  }
+
+  // Pre-AI Guardrail: Check query length to prevent abuse or prompt injection attempts
+  if (query.length > 500) {
+    return res.status(400).json({
+      error: 'Query is too long. Please keep your request under 500 characters.',
     });
   }
 
