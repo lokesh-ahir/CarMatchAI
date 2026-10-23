@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scoreAndRank } from '../scoringEngine.js';
+import { scoreAndRank } from './scoring.engine.js';
 
 describe('scoringEngine - scoreAndRank', () => {
   const mockDataset = [
