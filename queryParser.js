@@ -11,6 +11,7 @@ function buildParsingPrompt(query) {
 
 Return ONLY valid JSON with this exact structure:
 {
+  "isRelevant": true,     // boolean: true if query is about finding, buying, or comparing cars. false if unrelated/malicious.
   "filters": {
     "brand": [],          // array of brand names, empty if not mentioned
     "segment": [],        // e.g., ["SUV", "Sedan"]
@@ -60,6 +61,11 @@ function validateAndExtractParsedQuery(responseText) {
   if (!parsed || typeof parsed !== 'object') {
     throw new Error('Gemini response is not a valid object');
   }
+
+  if (parsed.isRelevant === false) {
+    throw new Error('IRRELEVANT_QUERY');
+  }
+
   if (!parsed.filters || typeof parsed.filters !== 'object') {
     throw new Error('Gemini response missing "filters" object');
   }

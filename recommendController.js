@@ -63,6 +63,11 @@ export async function handleRecommendation(req, res) {
 
     return res.json({ recommendations });
   } catch (error) {
+    if (error.message === 'IRRELEVANT_QUERY') {
+      return res.status(400).json({
+        error: 'I can only help with car recommendations. Please ask about finding, buying, or comparing cars.',
+      });
+    }
     // If Gemini query parsing fails, return 503
     return res.status(503).json({
       error: 'Service temporarily unavailable. Please try again later.',
