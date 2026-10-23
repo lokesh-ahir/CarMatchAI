@@ -1,6 +1,10 @@
 import { parseQuery, generateReasons } from './queryParser.js';
 import { scoreAndRank } from './scoringEngine.js';
 import { carDataset } from './index.js';
+import NodeCache from 'node-cache';
+
+// Cache AI responses for 1 hour to improve performance and reduce API costs
+const responseCache = new NodeCache({ stdTTL: 3600 });
 
 /**
  * Handles POST /api/recommend requests.
@@ -19,6 +23,13 @@ export async function handleRecommendation(req, res) {
   }
 
   try {
+    // Check cache first
+    const cacheKey = query.toLowerCase().trim();
+    const cachedResponse = responseCache.get(cacheKey);
+    if (cachedResponse) {
+      return res.json({ recommendations: cachedResponse });
+    }
+
     // Step 1: Parse the natural language query into structured filters and weights
     const parsedQuery = await parseQuery(query);
 
@@ -46,6 +57,9 @@ export async function handleRecommendation(req, res) {
       relevanceScore: car.relevanceScore,
       suitabilityReason: reasons[index] || '',
     }));
+
+    // Store in cache
+    responseCache.set(cacheKey, recommendations);
 
     return res.json({ recommendations });
   } catch (error) {
