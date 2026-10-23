@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import compression from 'compression';
 import { loadCarDataset } from './dataLoader.js';
 import { handleRecommendation } from './recommendController.js';
 
@@ -16,6 +18,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use(helmet());
+app.use(compression());
 app.use(cors());
 app.use(express.json());
 
